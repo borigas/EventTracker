@@ -50,7 +50,7 @@ namespace EventTracker.Trackers
         public static void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
             var activeProc = GetActiveProcess();
-            if (activeProc != null)
+            if (activeProc != null && activeProc.MainModule != null && activeProc.MainModule.FileVersionInfo != null)
             {
                 EventTrackerContext.Save(new WindowChange()
                 {
