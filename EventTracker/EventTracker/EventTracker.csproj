@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Helpers\ReflectiveEnumerator.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Model\LogOnEvent.cs" />
@@ -92,7 +93,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="icon.png" />
-    <Content Include="trayicon_success.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

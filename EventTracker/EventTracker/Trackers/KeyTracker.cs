@@ -96,29 +96,19 @@ namespace EventTracker.Trackers
 
         private static bool ProcessKeyCode(int vkCode)
         {
-            string key = KeyHelpers.ReadKeyCode(vkCode);
             try
             {
+                string key = KeyHelpers.ReadKeyCode(vkCode);
                 EventTrackerContext.Save(new KeyStroke()
                 {
                     EventTime = DateTime.Now,
                     Key = key,
+                    KeyCode = vkCode,
                 });
             }
-            catch (Exception ex1)
+            catch (Exception ex)
             {
-                try
-                {
-                    using (StreamWriter sw = new StreamWriter(Application.StartupPath + @"\log.txt", true))
-                    {
-                        sw.WriteLine(key);
-                        sw.Close();
-                    }
-                }
-                catch (Exception ex2)
-                {
-                    Console.WriteLine(ex2);
-                }
+                Logger.Log(ex.ToString());
                 return false;
             }
             return true;

@@ -9,6 +9,7 @@ namespace EventTracker.Model
     {
         public long Id { get; set; }
         public string Key { get; set; }
+        public int KeyCode { get; set; }
         public string KeyCharacter { get; set; }
         public DateTime EventTime { get; set; }
     }

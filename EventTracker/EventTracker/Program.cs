@@ -7,6 +7,7 @@ using EventTracker;
 using System.Drawing;
 using EventTracker.Trackers;
 using EventTracker.Helpers;
+using System.IO;
 
 namespace EventTracker
 {
@@ -32,6 +33,7 @@ namespace EventTracker
 
         private static void Start()
         {
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandledExceptionHandler);
             foreach (var eventTracker in _trackers)
             {
                 eventTracker.Start();
@@ -44,10 +46,16 @@ namespace EventTracker
             {
                 eventTracker.Stop();
             }
+            AppDomain.CurrentDomain.UnhandledException -= new UnhandledExceptionEventHandler(UnhandledExceptionHandler);
         }
 
         private static NotifyIcon trayIcon;
         private static ContextMenu trayMenu;
+
+        private static void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
+        {
+            Logger.Log("Unhandled exception:" + Environment.NewLine + e.ExceptionObject.ToString());
+        }
 
         private static void OnExit(object sender, EventArgs e)
         {

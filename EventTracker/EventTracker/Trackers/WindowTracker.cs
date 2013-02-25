@@ -1,4 +1,5 @@
-﻿using EventTracker.Model;
+﻿using EventTracker.Helpers;
+using EventTracker.Model;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,16 @@ namespace EventTracker.Trackers
 
         public override void Stop()
         {
+
+            EventTrackerContext.Save(new WindowChange()
+            {
+                WindowName = "App Shutdown",
+                ProductName = "App Shutdown",
+                ModulePath = "App Shutdown",
+                ModuleName = "App Shutdown",
+                EventTime = DateTime.Now,
+            });
+
             SystemEvents.PowerModeChanged -= new PowerModeChangedEventHandler(SystemEvents_PowerModeChanged);
             SystemEvents.SessionSwitch -= new SessionSwitchEventHandler(SystemEvents_SessionSwitch);
         }
@@ -49,18 +60,7 @@ namespace EventTracker.Trackers
 
         public static void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
-            var activeProc = GetActiveProcess();
-            if (activeProc != null && activeProc.MainModule != null && activeProc.MainModule.FileVersionInfo != null)
-            {
-                EventTrackerContext.Save(new WindowChange()
-                {
-                    WindowName = activeProc.MainWindowTitle,
-                    ProductName = activeProc.MainModule.FileVersionInfo.ProductName,
-                    ModulePath = activeProc.MainModule.FileName,
-                    ModuleName = Path.GetFileName(activeProc.MainModule.FileName),
-                    EventTime = DateTime.Now,
-                });
-            }
+            EventTrackerContext.Save(GetActiveWindowChange());
         }
 
         private static void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
@@ -106,6 +106,41 @@ namespace EventTracker.Trackers
                 return Buff.ToString();
             }
             return null;
+        }
+
+        private static WindowChange GetActiveWindowChange()
+        {
+            string windowName = string.Empty;
+            string productName = string.Empty;
+            string modulePath = string.Empty;
+            string moduleName = string.Empty;
+            bool error = false;
+            try
+            {
+                var activeProc = GetActiveProcess();
+                if (activeProc != null && activeProc.MainModule != null && activeProc.MainModule.FileVersionInfo != null)
+                {
+                    windowName = activeProc.MainWindowTitle;
+                    modulePath = activeProc.MainModule.FileName;
+                    moduleName = Path.GetFileName(activeProc.MainModule.FileName);
+                    productName = activeProc.MainModule.FileVersionInfo.ProductName;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(ex.ToString());
+                error = true;
+            }
+
+            return new WindowChange()
+            {
+                EventTime = DateTime.Now,
+                WindowName = windowName,
+                ModulePath = modulePath,
+                ModuleName = moduleName,
+                ProductName = productName,
+                ErrorFetchingInfo = error,
+            };
         }
 
         private static Process GetActiveProcess()

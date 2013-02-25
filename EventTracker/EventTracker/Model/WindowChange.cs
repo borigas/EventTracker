@@ -14,5 +14,6 @@ namespace EventTracker.Model
         public string ModuleName { get; set; }
         public string ModulePath { get; set; }
         public DateTime EventTime { get; set; }
+        public bool ErrorFetchingInfo { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using EventTracker.Model;
+﻿using EventTracker.Helpers;
+using EventTracker.Model;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -38,43 +39,57 @@ namespace EventTracker.Trackers
 
         private static void SystemEvents_SessionSwitch(object sender, SessionSwitchEventArgs e)
         {
-            if (e.Reason == SessionSwitchReason.SessionLogoff ||
-                e.Reason == SessionSwitchReason.SessionLock ||
-                e.Reason == SessionSwitchReason.RemoteDisconnect)
+            try
             {
-                EventTrackerContext.Save(new LogOnEvent()
+                if (e.Reason == SessionSwitchReason.SessionLogoff ||
+                    e.Reason == SessionSwitchReason.SessionLock ||
+                    e.Reason == SessionSwitchReason.RemoteDisconnect)
                 {
-                    IsLoggedOn = false,
-                    EventTime = DateTime.Now,
-                });
+                    EventTrackerContext.Save(new LogOnEvent()
+                    {
+                        IsLoggedOn = false,
+                        EventTime = DateTime.Now,
+                    });
+                }
+                else
+                {
+                    EventTrackerContext.Save(new LogOnEvent()
+                    {
+                        IsLoggedOn = true,
+                        EventTime = DateTime.Now,
+                    });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                EventTrackerContext.Save(new LogOnEvent()
-                {
-                    IsLoggedOn = true,
-                    EventTime = DateTime.Now,
-                });
+                Logger.Log(ex.ToString());
             }
         }
 
         private static void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
         {
-            if (e.Mode == PowerModes.Suspend)
+            try
             {
-                EventTrackerContext.Save(new LogOnEvent()
+                if (e.Mode == PowerModes.Suspend)
                 {
-                    IsLoggedOn = false,
-                    EventTime = DateTime.Now,
-                });
+                    EventTrackerContext.Save(new LogOnEvent()
+                    {
+                        IsLoggedOn = false,
+                        EventTime = DateTime.Now,
+                    });
+                }
+                else if (e.Mode == PowerModes.Resume)
+                {
+                    EventTrackerContext.Save(new LogOnEvent()
+                    {
+                        IsLoggedOn = true,
+                        EventTime = DateTime.Now,
+                    });
+                }
             }
-            else if (e.Mode == PowerModes.Resume)
+            catch (Exception ex)
             {
-                EventTrackerContext.Save(new LogOnEvent()
-                {
-                    IsLoggedOn = true,
-                    EventTime = DateTime.Now,
-                });
+                Logger.Log(ex.ToString());
             }
         }
     }
