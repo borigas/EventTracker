@@ -50,14 +50,17 @@ namespace EventTracker.Trackers
         public static void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
             var activeProc = GetActiveProcess();
-            EventTrackerContext.Save(new WindowChange()
+            if (activeProc != null)
             {
-                WindowName = activeProc.MainWindowTitle,
-                ProductName = activeProc.MainModule.FileVersionInfo.ProductName,
-                ModulePath = activeProc.MainModule.FileName,
-                ModuleName = Path.GetFileName(activeProc.MainModule.FileName),
-                EventTime = DateTime.Now,
-            });
+                EventTrackerContext.Save(new WindowChange()
+                {
+                    WindowName = activeProc.MainWindowTitle,
+                    ProductName = activeProc.MainModule.FileVersionInfo.ProductName,
+                    ModulePath = activeProc.MainModule.FileName,
+                    ModuleName = Path.GetFileName(activeProc.MainModule.FileName),
+                    EventTime = DateTime.Now,
+                });
+            }
         }
 
         private static void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
