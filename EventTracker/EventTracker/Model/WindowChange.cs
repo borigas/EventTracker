@@ -9,7 +9,10 @@ namespace EventTracker.Model
     public class WindowChange
     {
         public long Id { get; set; }
+        public string ProductName { get; set; }
         public string WindowName { get; set; }
+        public string ModuleName { get; set; }
+        public string ModulePath { get; set; }
         public DateTime EventTime { get; set; }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using EventTracker.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -35,14 +37,16 @@ namespace EventTracker.Trackers
 
         [DllImport("user32.dll")]
         static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern int GetWindowThreadProcessId(IntPtr handle, out uint processId);
         #endregion
 
         private static string GetActiveWindowTitle()
         {
             const int nChars = 256;
-            IntPtr handle = IntPtr.Zero;
             StringBuilder Buff = new StringBuilder(nChars);
-            handle = GetForegroundWindow();
+            IntPtr handle = GetForegroundWindow();
 
             if (GetWindowText(handle, Buff, nChars) > 0)
             {
@@ -51,13 +55,40 @@ namespace EventTracker.Trackers
             return null;
         }
 
+        private static Process GetActiveProcess()
+        {
+            const int nChars = 256;
+            StringBuilder Buff = new StringBuilder(nChars);
+            IntPtr handle = GetForegroundWindow();
+
+            return GetProcess(handle);
+        }
+
+        public static Process GetProcess(IntPtr hwnd)
+        {
+            try
+            {
+                uint pid = 0;
+                GetWindowThreadProcessId(hwnd, out pid);
+                return Process.GetProcessById((int)pid); //Gets the process by ID. 
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         public static void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
+            var activeProc = GetActiveProcess();
             using (var db = new EventTrackerContext())
             {
                 db.WindowChanges.Add(new WindowChange()
                 {
-                    WindowName = GetActiveWindowTitle(),
+                    WindowName = activeProc.MainWindowTitle,
+                    ProductName = activeProc.MainModule.FileVersionInfo.ProductName,
+                    ModulePath = activeProc.MainModule.FileName,
+                    ModuleName = Path.GetFileName(activeProc.MainModule.FileName),
                     EventTime = DateTime.Now,
                 });
                 db.SaveChanges();
