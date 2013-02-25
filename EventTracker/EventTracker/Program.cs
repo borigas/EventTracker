@@ -72,8 +72,7 @@ namespace EventTracker
 
             //trayIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(trayIcon_MouseClick);
 
-            trayIcon.Icon = Icon.FromHandle(Properties.Resources.trayicon_success.GetHicon());
-            trayIcon.Icon = new Icon(SystemIcons.Application, 40, 40);
+            trayIcon.Icon = Icon.FromHandle(Properties.Resources.icon.GetHicon());
 
             // Add menu to tray icon and show it.
             trayIcon.ContextMenu = trayMenu;
