@@ -1,4 +1,5 @@
 ﻿using EventTracker.Model;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,17 +11,21 @@ using System.Threading.Tasks;
 
 namespace EventTracker.Trackers
 {
-    public class WindowTracker
+    public class WindowTracker : BaseEventTracker
     {
         static WinEventDelegate callback = new WinEventDelegate(WinEventProc);
-        public static void Start()
+        public override void Start()
         {
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, callback, 0, 0, WINEVENT_OUTOFCONTEXT);
+
+            SystemEvents.PowerModeChanged += new PowerModeChangedEventHandler(SystemEvents_PowerModeChanged);
+            SystemEvents.SessionSwitch += new SessionSwitchEventHandler(SystemEvents_SessionSwitch);
         }
 
-        public static void Stop()
+        public override void Stop()
         {
-
+            SystemEvents.PowerModeChanged -= new PowerModeChangedEventHandler(SystemEvents_PowerModeChanged);
+            SystemEvents.SessionSwitch -= new SessionSwitchEventHandler(SystemEvents_SessionSwitch);
         }
 
         #region Win API Imports
@@ -41,6 +46,51 @@ namespace EventTracker.Trackers
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern int GetWindowThreadProcessId(IntPtr handle, out uint processId);
         #endregion
+
+        public static void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+        {
+            var activeProc = GetActiveProcess();
+            EventTrackerContext.Save(new WindowChange()
+            {
+                WindowName = activeProc.MainWindowTitle,
+                ProductName = activeProc.MainModule.FileVersionInfo.ProductName,
+                ModulePath = activeProc.MainModule.FileName,
+                ModuleName = Path.GetFileName(activeProc.MainModule.FileName),
+                EventTime = DateTime.Now,
+            });
+        }
+
+        private static void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
+        {
+            if (e.Mode == PowerModes.Suspend)
+            {
+                EventTrackerContext.Save(new WindowChange()
+                {
+                    WindowName = "Suspended",
+                    ProductName = "Suspended",
+                    ModulePath = "Suspended",
+                    ModuleName = "Suspended",
+                    EventTime = DateTime.Now,
+                });
+            }
+        }
+
+        private static void SystemEvents_SessionSwitch(object sender, SessionSwitchEventArgs e)
+        {
+            if (e.Reason == SessionSwitchReason.SessionLogoff ||
+                e.Reason == SessionSwitchReason.SessionLock ||
+                e.Reason == SessionSwitchReason.RemoteDisconnect)
+            {
+                EventTrackerContext.Save(new WindowChange()
+                {
+                    WindowName = "Logged Off",
+                    ProductName = "Logged Off",
+                    ModulePath = "Logged Off",
+                    ModuleName = "Logged Off",
+                    EventTime = DateTime.Now,
+                });
+            }
+        }
 
         private static string GetActiveWindowTitle()
         {
@@ -75,23 +125,6 @@ namespace EventTracker.Trackers
             catch (Exception ex)
             {
                 return null;
-            }
-        }
-
-        public static void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
-        {
-            var activeProc = GetActiveProcess();
-            using (var db = new EventTrackerContext())
-            {
-                db.WindowChanges.Add(new WindowChange()
-                {
-                    WindowName = activeProc.MainWindowTitle,
-                    ProductName = activeProc.MainModule.FileVersionInfo.ProductName,
-                    ModulePath = activeProc.MainModule.FileName,
-                    ModuleName = Path.GetFileName(activeProc.MainModule.FileName),
-                    EventTime = DateTime.Now,
-                });
-                db.SaveChanges();
             }
         }
     }

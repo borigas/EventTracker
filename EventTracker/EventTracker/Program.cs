@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using EventTracker;
 using System.Drawing;
 using EventTracker.Trackers;
+using EventTracker.Helpers;
 
 namespace EventTracker
 {
@@ -17,16 +18,32 @@ namespace EventTracker
         [STAThread]
         static void Main()
         {
-
             CreateTrayIcon();
 
-            KeyTracker.Start();
-            WindowTracker.Start();
+            _trackers = ReflectiveEnumerator.GetEnumerableOfType<BaseEventTracker>();
+            Start();
 
             Application.Run();
 
-            WindowTracker.Stop();
-            KeyTracker.Stop();
+            Stop();
+        }
+
+        private static IEnumerable<BaseEventTracker> _trackers;
+
+        private static void Start()
+        {
+            foreach (var eventTracker in _trackers)
+            {
+                eventTracker.Start();
+            }
+        }
+
+        private static void Stop()
+        {
+            foreach (var eventTracker in _trackers)
+            {
+                eventTracker.Stop();
+            }
         }
 
         private static NotifyIcon trayIcon;

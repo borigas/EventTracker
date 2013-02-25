@@ -53,8 +53,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\ReflectiveEnumerator.cs" />
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Model\LogOnEvent.cs" />
     <Compile Include="Model\WindowChange.cs" />
+    <Compile Include="Trackers\BaseEventTracker.cs" />
+    <Compile Include="Trackers\LoggedOnTracker.cs" />
     <Compile Include="Trackers\WindowTracker.cs" />
     <Compile Include="Model\EventTrackerContext.cs" />
     <Compile Include="Helpers\KeyHelpers.cs" />
