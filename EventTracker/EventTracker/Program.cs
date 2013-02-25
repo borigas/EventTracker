@@ -21,7 +21,11 @@ namespace EventTracker
             CreateTrayIcon();
 
             KeyTracker.Start();
+            WindowTracker.Start();
+
             Application.Run();
+
+            WindowTracker.Stop();
             KeyTracker.Stop();
         }
 

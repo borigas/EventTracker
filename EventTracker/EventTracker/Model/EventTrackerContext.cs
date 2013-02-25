@@ -11,7 +11,6 @@ namespace EventTracker.Model
         public EventTrackerContext()
             : base("EventTracker")
         {
-            Console.WriteLine(this.Database.Connection.ConnectionString);
         }
 
         public DbSet<KeyStroke> KeyStrokes { get; set; }

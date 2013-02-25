@@ -10,10 +10,10 @@ namespace EventTracker.Trackers
 {
     public class WindowTracker
     {
+        static WinEventDelegate callback = new WinEventDelegate(WinEventProc);
         public static void Start()
         {
-            WinEventDelegate dele = new WinEventDelegate(WinEventProc);
-            IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
+            IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, callback, 0, 0, WINEVENT_OUTOFCONTEXT);
         }
 
         public static void Stop()
@@ -60,6 +60,7 @@ namespace EventTracker.Trackers
                     WindowName = GetActiveWindowTitle(),
                     EventTime = DateTime.Now,
                 });
+                db.SaveChanges();
             }
         }
     }
