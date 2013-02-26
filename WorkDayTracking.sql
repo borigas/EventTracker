@@ -1,6 +1,6 @@
 
 -- Find 1st log in of the day
-WITH startOfDay AS (
+;WITH startOfDay AS (
     SELECT *, 
            ROW_NUMBER() OVER(PARTITION BY DATEADD(dd, 0, DATEDIFF(dd, 0, EventTime))
                                  ORDER BY Id) AS rk
@@ -8,10 +8,10 @@ WITH startOfDay AS (
 	  WHERE IsLoggedOn = 1)
 SELECT EventTime AS StartOfDay
 FROM startOfDay
-WHERE rk = 1;
+WHERE rk = 1
 
 -- Find last log out of the day
-WITH endOfDay AS (
+;WITH endOfDay AS (
     SELECT *, 
            ROW_NUMBER() OVER(PARTITION BY DATEADD(dd, 0, DATEDIFF(dd, 0, EventTime))
                                  ORDER BY Id DESC) AS rk
