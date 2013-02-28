@@ -1,0 +1,60 @@
+﻿@model IEnumerable<EventTracker.Web.Models.ChartEvent>
+
+@{
+    ViewBag.Title = "Logged On";
+}
+
+@section Scripts{
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+
+    <script type="text/javascript">
+        var chart;
+        $(document).ready(function () {
+            chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: 'chart-container',
+                    type: 'spline'
+                },
+                title: {
+                    text: 'Snow depth in the Vikjafjellet mountain, Norway'
+                },
+                subtitle: {
+                    text: 'An example of irregular time data in Highcharts JS'
+                },
+                xAxis: {
+                    type: 'datetime',
+                    dateTimeLabelFormats: { // don't display the dummy year
+                        month: '%e. %b',
+                        year: '%b'
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: 'Snow depth (m)'
+                    },
+                    min: 0
+                },
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.series.name + '</b><br/>' +
+                        Highcharts.dateFormat('%e. %b', this.x) + ': ' + this.y + ' m';
+                    }
+                },
+
+                series: [{
+                    @Html.Raw(string.Join(",", @Model.GroupBy(x => x.EventTime.Date).Select(dayEvents =>
+                        string.Format(@"
+                            name: '{0}',
+                            data: [
+                                    {1}
+                            ]", "\"" + dayEvents.First().EventTime.DayOfWeek.ToString() + "\"",
+                              string.Join(",", dayEvents.Select(x => string.Format("[{0}, {1}]", x.MillisecondsSinceEpoch, x.Value)))))))
+                }]
+            });
+        });
+    </script>
+}
+
+<h2>Logged On Chart</h2>
+
+<div id="chart-container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
