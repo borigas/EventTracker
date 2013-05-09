@@ -79,32 +79,33 @@ namespace EventTracker.Trackers
             if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
             {
                 int vkCode = Marshal.ReadInt32(lParam);
-                ProcessKeyCodeAsync(vkCode);
+                ProcessKeyCode(vkCode);
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
         }
 
-        private static async Task<bool> ProcessKeyCodeAsync(int vkCode)
-        {
-            var task = Task.Run<bool>(() =>
-            {
-                return ProcessKeyCode(vkCode);
-            });
-            await task;
-            return task.Result;
-        }
+        //private static async Task<bool> ProcessKeyCodeAsync(int vkCode)
+        //{
+        //    var task = Task.Run<bool>(() =>
+        //    {
+        //        return ProcessKeyCode(vkCode);
+        //    });
+        //    return task.Result;
+        //}
 
         private static bool ProcessKeyCode(int vkCode)
         {
             try
             {
                 string key = KeyHelpers.ReadKeyCode(vkCode);
-                EventTrackerContext.Save(new KeyStroke()
-                {
-                    EventTime = DateTime.Now,
-                    Key = key,
-                    KeyCode = vkCode,
-                });
+                //EventTrackerContext.Save(
+                EventQueue.Enqueue(
+                    new KeyStroke()
+                    {
+                        EventTime = DateTime.Now,
+                        Key = key,
+                        KeyCode = vkCode,
+                    });
             }
             catch (Exception ex)
             {

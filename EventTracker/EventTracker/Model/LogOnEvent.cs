@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EventTracker.Model
 {
-    public class LogOnEvent
+    public class LogOnEvent : TrackableEvent
     {
         public long Id { get; set; }
         public bool IsLoggedOn { get; set; }

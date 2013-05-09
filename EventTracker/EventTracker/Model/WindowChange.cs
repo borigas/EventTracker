@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EventTracker.Model
 {
-    public class WindowChange
+    public class WindowChange : TrackableEvent
     {
         public long Id { get; set; }
         public string ProductName { get; set; }

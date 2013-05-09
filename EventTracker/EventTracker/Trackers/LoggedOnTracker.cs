@@ -17,21 +17,25 @@ namespace EventTracker.Trackers
             SystemEvents.SessionSwitch += new SessionSwitchEventHandler(SystemEvents_SessionSwitch);
 
             // Must be logged on to start
-            EventTrackerContext.Save(new LogOnEvent()
-            {
-                IsLoggedOn = true,
-                EventTime = DateTime.Now,
-            });
+            //EventTrackerContext.Save(
+            EventQueue.Enqueue(
+                new LogOnEvent()
+                {
+                    IsLoggedOn = true,
+                    EventTime = DateTime.Now,
+                });
         }
 
         public override void Stop()
         {
             // Treat stop as a log off
-            EventTrackerContext.Save(new LogOnEvent()
-            {
-                IsLoggedOn = false,
-                EventTime = DateTime.Now,
-            });
+            //EventTrackerContext.Save(
+            EventQueue.Enqueue(
+                new LogOnEvent()
+                {
+                    IsLoggedOn = false,
+                    EventTime = DateTime.Now,
+                });
 
             SystemEvents.PowerModeChanged -= new PowerModeChangedEventHandler(SystemEvents_PowerModeChanged);
             SystemEvents.SessionSwitch -= new SessionSwitchEventHandler(SystemEvents_SessionSwitch);
@@ -45,19 +49,23 @@ namespace EventTracker.Trackers
                     e.Reason == SessionSwitchReason.SessionLock ||
                     e.Reason == SessionSwitchReason.RemoteDisconnect)
                 {
-                    EventTrackerContext.Save(new LogOnEvent()
-                    {
-                        IsLoggedOn = false,
-                        EventTime = DateTime.Now,
-                    });
+                    //EventTrackerContext.Save(
+                    EventQueue.Enqueue(
+                        new LogOnEvent()
+                        {
+                            IsLoggedOn = false,
+                            EventTime = DateTime.Now,
+                        });
                 }
                 else
                 {
-                    EventTrackerContext.Save(new LogOnEvent()
-                    {
-                        IsLoggedOn = true,
-                        EventTime = DateTime.Now,
-                    });
+                    //EventTrackerContext.Save(
+                    EventQueue.Enqueue(
+                        new LogOnEvent()
+                        {
+                            IsLoggedOn = true,
+                            EventTime = DateTime.Now,
+                        });
                 }
             }
             catch (Exception ex)
@@ -72,19 +80,23 @@ namespace EventTracker.Trackers
             {
                 if (e.Mode == PowerModes.Suspend)
                 {
-                    EventTrackerContext.Save(new LogOnEvent()
-                    {
-                        IsLoggedOn = false,
-                        EventTime = DateTime.Now,
-                    });
+                    //EventTrackerContext.Save(
+                    EventQueue.Enqueue(
+                        new LogOnEvent()
+                        {
+                            IsLoggedOn = false,
+                            EventTime = DateTime.Now,
+                        });
                 }
                 else if (e.Mode == PowerModes.Resume)
                 {
-                    EventTrackerContext.Save(new LogOnEvent()
-                    {
-                        IsLoggedOn = true,
-                        EventTime = DateTime.Now,
-                    });
+                    //EventTrackerContext.Save(
+                    EventQueue.Enqueue(
+                        new LogOnEvent()
+                        {
+                            IsLoggedOn = true,
+                            EventTime = DateTime.Now,
+                        });
                 }
             }
             catch (Exception ex)

@@ -56,7 +56,9 @@
     <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Helpers\ReflectiveEnumerator.cs" />
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Model\EventQueue.cs" />
     <Compile Include="Model\LogOnEvent.cs" />
+    <Compile Include="Model\TrackableEvent.cs" />
     <Compile Include="Model\WindowChange.cs" />
     <Compile Include="Trackers\BaseEventTracker.cs" />
     <Compile Include="Trackers\LoggedOnTracker.cs" />

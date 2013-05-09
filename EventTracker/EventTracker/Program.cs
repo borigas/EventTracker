@@ -8,6 +8,7 @@ using System.Drawing;
 using EventTracker.Trackers;
 using EventTracker.Helpers;
 using System.IO;
+using EventTracker.Model;
 
 namespace EventTracker
 {
@@ -46,6 +47,7 @@ namespace EventTracker
             {
                 eventTracker.Stop();
             }
+            EventQueue.FlushQueue();
             AppDomain.CurrentDomain.UnhandledException -= new UnhandledExceptionEventHandler(UnhandledExceptionHandler);
         }
 

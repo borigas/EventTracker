@@ -5,7 +5,7 @@ using System.Text;
 
 namespace EventTracker.Model
 {
-    public class KeyStroke
+    public class KeyStroke : TrackableEvent
     {
         public long Id { get; set; }
         public string Key { get; set; }

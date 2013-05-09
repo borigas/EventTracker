@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Text;
+using System.Timers;
 
 namespace EventTracker.Model
 {
@@ -11,6 +13,15 @@ namespace EventTracker.Model
         public EventTrackerContext()
             : base("EventTracker")
         {
+        }
+
+        public static void Save(TrackableEvent entity)
+        {
+            using (var db = new EventTrackerContext())
+            {
+                db.Set(entity.GetType()).Add(entity);
+                db.SaveChanges();
+            }
         }
 
         public static void Save<T>(T entity) where T : class

@@ -25,15 +25,16 @@ namespace EventTracker.Trackers
 
         public override void Stop()
         {
-
-            EventTrackerContext.Save(new WindowChange()
-            {
-                WindowName = "App Shutdown",
-                ProductName = "App Shutdown",
-                ModulePath = "App Shutdown",
-                ModuleName = "App Shutdown",
-                EventTime = DateTime.Now,
-            });
+            //EventTrackerContext.Save(
+            EventQueue.Enqueue(
+                new WindowChange()
+                {
+                    WindowName = "App Shutdown",
+                    ProductName = "App Shutdown",
+                    ModulePath = "App Shutdown",
+                    ModuleName = "App Shutdown",
+                    EventTime = DateTime.Now,
+                });
 
             SystemEvents.PowerModeChanged -= new PowerModeChangedEventHandler(SystemEvents_PowerModeChanged);
             SystemEvents.SessionSwitch -= new SessionSwitchEventHandler(SystemEvents_SessionSwitch);
@@ -60,21 +61,24 @@ namespace EventTracker.Trackers
 
         public static void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
-            EventTrackerContext.Save(GetActiveWindowChange());
+            //EventTrackerContext.Save(
+            EventQueue.Enqueue(GetActiveWindowChange());
         }
 
         private static void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
         {
             if (e.Mode == PowerModes.Suspend)
             {
-                EventTrackerContext.Save(new WindowChange()
-                {
-                    WindowName = "Suspended",
-                    ProductName = "Suspended",
-                    ModulePath = "Suspended",
-                    ModuleName = "Suspended",
-                    EventTime = DateTime.Now,
-                });
+                //EventTrackerContext.Save(
+                EventQueue.Enqueue(
+                    new WindowChange()
+                    {
+                        WindowName = "Suspended",
+                        ProductName = "Suspended",
+                        ModulePath = "Suspended",
+                        ModuleName = "Suspended",
+                        EventTime = DateTime.Now,
+                    });
             }
         }
 
@@ -84,14 +88,16 @@ namespace EventTracker.Trackers
                 e.Reason == SessionSwitchReason.SessionLock ||
                 e.Reason == SessionSwitchReason.RemoteDisconnect)
             {
-                EventTrackerContext.Save(new WindowChange()
-                {
-                    WindowName = "Logged Off",
-                    ProductName = "Logged Off",
-                    ModulePath = "Logged Off",
-                    ModuleName = "Logged Off",
-                    EventTime = DateTime.Now,
-                });
+                //EventTrackerContext.Save(
+                EventQueue.Enqueue(
+                    new WindowChange()
+                    {
+                        WindowName = "Logged Off",
+                        ProductName = "Logged Off",
+                        ModulePath = "Logged Off",
+                        ModuleName = "Logged Off",
+                        EventTime = DateTime.Now,
+                    });
             }
         }
 
